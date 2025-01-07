@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.env
+
+# SQLite Database
+*.db
+
+# Logs
+logs/
+*.log
+
+# Docker
+*.dockerfile

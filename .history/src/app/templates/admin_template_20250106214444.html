@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .projects { margin: 20px 0; }
+        .status { margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>Admin Dashboard</h1>
+
+    <div class="status">
+        <h2>System Status:</h2>
+        <div>Langflow Status: <strong>{{ status.langflow_status }}</strong></div>
+        <div>Database 1 Status: <strong>{{ status.database_1_status }}</strong></div>
+        <div>Database 2 Status: <strong>{{ status.database_2_status }}</strong></div>
+    </div>
+
+    <div class="projects">
+        <h2>Saved Projects:</h2>
+        <ul>
+            {% for project in projects %}
+            <li>{{ project }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>

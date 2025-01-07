@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Langflow Playground</title>
+</head>
+<body>
+    <h1>Langflow Playground</h1>
+    <form id="playground-form">
+        <label for="input-text">Input:</label><br>
+        <textarea id="input-text" name="input-text" rows="4" cols="50"></textarea><br><br>
+
+        <label for="flow-id">Flow ID:</label>
+        <input type="text" id="flow-id" name="flow-id" required><br><br>
+
+        <label for="session-id">Session ID:</label>
+        <input type="text" id="session-id" name="session-id" value="default_session"><br><br>
+
+        <label for="api-key">API Key:</label>
+        <input type="password" id="api-key" name="api-key"><br><br>
+
+        <button type="button" id="submit-button">Run</button>
+    </form>
+
+    <div id="response-container">
+        <h2>Response:</h2>
+        <pre id="response-output"></pre>
+    </div>
+
+    <script>
+        document.getElementById("submit-button").addEventListener("click", async () => {
+            const inputText = document.getElementById("input-text").value;
+            const flowId = document.getElementById("flow-id").value;
+            const sessionId = document.getElementById("session-id").value;
+            const apiKey = document.getElementById("api-key").value;
+
+            const response = await fetch("/playground", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ input_text: inputText, flow_id: flowId, session_id: sessionId, api_key: apiKey })
+            });
+
+            const result = await response.json();
+            document.getElementById("response-output").textContent = JSON.stringify(result, null, 2);
+        });
+    </script>
+</body>
+</html>
+
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Langflow Playground</title>
+</head>
+<body>
+    <h1>Langflow Playground</h1>
+    <form id="playground-form">
+        <label for="input-text">Input:</label><br>
+        <textarea id="input-text" name="input-text" rows="4" cols="50"></textarea><br><br>
+
+        <label for="flow-id">Flow ID:</label>
+        <input type="text" id="flow-id" name="flow-id" required><br><br>
+
+        <label for="session-id">Session ID:</label>
+        <input type="text" id="session-id" name="session-id" value="default_session"><br><br>
+
+        <label for="api-key">API Key:</label>
+        <input type="password" id="api-key" name="api-key"><br><br>
+
+        <button type="button" id="submit-button">Run</button>
+    </form>
+
+    <div id="response-container">
+        <h2>Response:</h2>
+        <pre id="response-output"></pre>
+    </div>
+
+    <script>
+        document.getElementById("submit-button").addEventListener("click", async () => {
+            const inputText = document.getElementById("input-text").value;
+            const flowId = document.getElementById("flow-id").value;
+            const sessionId = document.getElementById("session-id").value;
+            const apiKey = document.getElementById("api-key").value;
+
+            const response = await fetch("/playground", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ input_text: inputText, flow_id: flowId, session_id: sessionId, api_key: apiKey })
+            });
+
+            const result = await response.json();
+            document.getElementById("response-output").textContent = JSON.stringify(result, null, 2);
+        });
+    </script>
+</body>
+</html> -->

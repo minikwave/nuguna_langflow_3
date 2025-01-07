@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Langflow Integration</title>
+</head>
+<body>
+    <h1>Langflow Project Management</h1>
+
+    <div>
+        <h2>Your Projects</h2>
+        <ul id="project-list"></ul>
+    </div>
+
+    <div>
+        <h2>Create or Update Project</h2>
+        <form id="project-form">
+            <label for="project-name">Project Name:</label>
+            <input type="text" id="project-name" name="project-name" required>
+            <textarea id="project-content" name="project-content" rows="10" cols="50"></textarea>
+            <button type="submit">Save Project</button>
+        </form>
+    </div>
+
+    <script>
+        const sessionId = "default_session";
+
+        async function fetchProjects() {
+            const response = await fetch(`/projects/${sessionId}`);
+            const data = await response.json();
+            const projectList = document.getElementById("project-list");
+            projectList.innerHTML = "";
+            data.projects.forEach(project => {
+                const listItem = document.createElement("li");
+                listItem.textContent = project;
+                projectList.appendChild(listItem);
+            });
+        }
+
+        document.getElementById("project-form").addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const name = document.getElementById("project-name").value;
+            const content = document.getElementById("project-content").value;
+
+            await fetch(`/projects/${sessionId}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name, content })
+            });
+
+            fetchProjects();
+        });
+
+        fetchProjects();
+    </script>
+</body>
+</html>
