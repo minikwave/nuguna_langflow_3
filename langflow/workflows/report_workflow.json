@@ -1,0 +1,28 @@
+{
+    "id": "report-workflow",
+    "name": "Report Data Extraction Workflow",
+    "nodes": [
+      {
+        "id": "1",
+        "type": "Report Selector",
+        "plugin": "app.api.services.report_manager.ReportSelector",
+        "input": "report_type",
+        "output": ["table", "dimensions", "metrics"]
+      },
+      {
+        "id": "2",
+        "type": "SQL Generator",
+        "plugin": "app.api.services.sql_executor.SQLGenerator",
+        "input": ["table", "dimensions", "metrics", "filters"],
+        "output": "sql_query"
+      },
+      {
+        "id": "3",
+        "type": "SQL Executor",
+        "plugin": "app.api.services.sql_executor.SQLExecutor",
+        "input": "sql_query",
+        "output": "query_result"
+      }
+    ]
+  }
+  

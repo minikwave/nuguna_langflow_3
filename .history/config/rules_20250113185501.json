@@ -1,0 +1,21 @@
+[
+    {
+      "keywords": ["정기후원", "일시후원"],
+      "table": "source_report",
+      "dimensions": ["event_date"],
+      "metrics": ["regular_donation", "temporary_donation"]
+    },
+    {
+      "keywords": ["소스/매체", "전환율"],
+      "table": "source_report",
+      "dimensions": ["source_medium"],
+      "metrics": ["begin_checkout", "session"]
+    },
+    {
+      "keywords": ["페이지뷰", "이탈률"],
+      "table": "page_report",
+      "dimensions": ["page_title"],
+      "metrics": ["pageview", "average_engagement_time_per_user"]
+    }
+  ]
+  

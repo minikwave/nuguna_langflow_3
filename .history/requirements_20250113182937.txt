@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+sqlalchemy
+pydantic
+sqlite3
+streamlit
+requests
+pytest
+prometheus_client
+langchain

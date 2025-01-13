@@ -1,0 +1,8 @@
+{
+    "processing_order": [
+      "app.api.plugins.rule_based_plugin.RuleBasedPlugin",
+      "app.api.plugins.vectordb_plugin.VectorDBPlugin",
+      "app.api.plugins.ai_model_plugin.AIModelPlugin"
+    ]
+  }
+  

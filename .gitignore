@@ -1,0 +1,11 @@
+# Python 캐시 파일
+*.pyc
+*.pyo
+__pycache__/
+
+# 가상 환경
+venv/
+env/
+
+# 환경 변수
+.env

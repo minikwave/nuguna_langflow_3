@@ -1,0 +1,23 @@
+{
+    "source_report": {
+      "description": "유입 채널 데이터",
+      "columns": {
+        "event_date": "STRING",
+        "source_medium": "STRING",
+        "regular_donation": "INT64",
+        "temporary_donation": "INT64",
+        "begin_checkout": "INT64",
+        "session": "INT64"
+      }
+    },
+    "page_report": {
+      "description": "페이지 관련 데이터",
+      "columns": {
+        "event_date": "STRING",
+        "page_title": "STRING",
+        "pageview": "INT64",
+        "average_engagement_time_per_user": "FLOAT64"
+      }
+    }
+  }
+  

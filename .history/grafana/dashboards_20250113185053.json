@@ -1,0 +1,30 @@
+{
+    "dashboard": {
+      "title": "Phase 1.5 Metrics Dashboard",
+      "panels": [
+        {
+          "type": "graph",
+          "title": "Workflow Execution Time",
+          "targets": [
+            {
+              "expr": "workflow_execution_time_ms",
+              "legendFormat": "{{workflow_id}}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "type": "table",
+          "title": "Query Results",
+          "targets": [
+            {
+              "expr": "query_results",
+              "legendFormat": "{{workflow_id}}",
+              "refId": "B"
+            }
+          ]
+        }
+      ]
+    }
+  }
+  
