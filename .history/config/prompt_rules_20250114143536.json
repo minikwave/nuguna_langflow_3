@@ -1,0 +1,14 @@
+{
+    "rules": [
+        {
+            "rule_id": 1,
+            "condition": "age > 18",
+            "action": "SELECT * FROM users WHERE age > 18"
+        },
+        {
+            "rule_id": 2,
+            "condition": "salary > 50000",
+            "action": "SELECT * FROM employees WHERE salary > 50000"
+        }
+    ]
+}

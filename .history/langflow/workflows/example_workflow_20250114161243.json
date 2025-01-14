@@ -1,0 +1,27 @@
+{
+    "id": "example_workflow",
+    "name": "Example Workflow",
+    "description": "This is a test workflow for Langflow integration.",
+    "nodes": [
+        {
+            "id": "1",
+            "type": "Input Node",
+            "plugin": "app.plugins.input_node.InputNode",
+            "output": "input_data"
+        },
+        {
+            "id": "2",
+            "type": "Processing Node",
+            "plugin": "app.plugins.processing_node.ProcessingNode",
+            "input": "input_data",
+            "output": "processed_data"
+        },
+        {
+            "id": "3",
+            "type": "Output Node",
+            "plugin": "app.plugins.output_node.OutputNode",
+            "input": "processed_data",
+            "output": "final_result"
+        }
+    ]
+}

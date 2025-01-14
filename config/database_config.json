@@ -1,0 +1,8 @@
+{
+    "database": {
+        "type": "sqlite",
+        "url": "sqlite:///./test.db",
+        "pool_size": 5,
+        "timeout": 30
+    }
+}

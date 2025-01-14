@@ -1,0 +1,161 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+      - "7860:7860" # Langflow port
+    environment:
+      DATABASE_TYPE: "sqlite"  # "postgresql"로 변경 가능
+      DATABASE_URL: "sqlite:///./test.db"
+    volumes:
+      - .:/app
+    command: >
+      bash -c "python init_db.py &&
+      uvicorn app.main:app --host 0.0.0.0 --port 8000 &&
+      langflow run --host 0.0.0.0 --port 7860"
+
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./grafana/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: testdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  grafana_data:
+    driver: local
+  postgres_data:
+    driver: local
+
+
+# version: "3.8"
+
+# services:
+#   app:
+#     build:
+#       context: .
+#       dockerfile: Dockerfile
+#     ports:
+#       - "8000:8000"
+#       - "7860:7860" # Langflow port
+#     environment:
+#       DATABASE_URL: "sqlite:///./test.db"
+#     volumes:
+#       - .:/app
+#     command: >
+#       bash -c "python init_db.py &&
+#       uvicorn app.main:app --host 0.0.0.0 --port 8000 &&
+#       langflow run --host 0.0.0.0 --port 7860"
+
+#   prometheus:
+#     image: prom/prometheus
+#     volumes:
+#       - ./grafana/prometheus.yml:/etc/prometheus/prometheus.yml
+#     ports:
+#       - "9090:9090"
+
+#   grafana:
+#     image: grafana/grafana
+#     ports:
+#       - "3000:3000"
+#     environment:
+#       - GF_SECURITY_ADMIN_USER=admin
+#       - GF_SECURITY_ADMIN_PASSWORD=admin
+#     volumes:
+#       - grafana_data:/var/lib/grafana
+
+# volumes:
+#   grafana_data:
+#     driver: local
+
+
+# # version: "3.8"
+
+# # services:
+# #   app:
+# #     build:
+# #       context: .
+# #       dockerfile: Dockerfile
+# #     ports:
+# #       - "8000:8000"
+# #     environment:
+# #       DATABASE_URL: "sqlite:///./test.db"
+# #     volumes:
+# #       - .:/app
+# #     command: >
+# #       bash -c "python init_db.py &&
+# #       uvicorn app.main:app --host 0.0.0.0 --port 8000"
+
+# #   prometheus:
+# #     image: prom/prometheus
+# #     volumes:
+# #       - ./grafana/prometheus.yml:/etc/prometheus/prometheus.yml
+# #     ports:
+# #       - "9090:9090"
+
+# #   grafana:
+# #     image: grafana/grafana
+# #     ports:
+# #       - "3000:3000"
+# #     environment:
+# #       - GF_SECURITY_ADMIN_USER=admin
+# #       - GF_SECURITY_ADMIN_PASSWORD=admin
+# #     volumes:
+# #       - grafana_data:/var/lib/grafana
+
+# # volumes:
+# #   grafana_data:
+# #     driver: local
+
+
+# # # version: "3.8"
+
+# # # services:
+# # #   app:
+# # #     build:
+# # #       context: .
+# # #       dockerfile: Dockerfile
+# # #     ports:
+# # #       - "8000:8000"
+# # #     environment:
+# # #       DATABASE_URL: "sqlite:///./test.db"
+# # #     volumes:
+# # #       - .:/app
+# # #     command: ["bash", "-c", "python init_db.py && uvicorn app.main:app --host 0.0.0.0 --port 8000"]
+
+# # #   prometheus:
+# # #     image: prom/prometheus
+# # #     volumes:
+# # #       - ./grafana/prometheus.yml:/etc/prometheus/prometheus.yml
+# # #     ports:
+# # #       - "9090:9090"
+
+# # #   grafana:
+# # #     image: grafana/grafana
+# # #     ports:
+# # #       - "3000:3000"

@@ -1,0 +1,6 @@
+{
+    "langflow": {
+        "api_base": "http://localhost:7860/api/v1",
+        "default_workflow": "example_workflow"
+    }
+}

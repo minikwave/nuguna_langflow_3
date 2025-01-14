@@ -1,0 +1,20 @@
+{
+    "rules": [
+        {
+            "prompt": "2024년 평균 정기후원 금액과 일시후원 금액을 알려줘.",
+            "table": "source_report",
+            "dimension": ["event_date"],
+            "metric": ["regular_donation", "temporary_donation"],
+            "response_format": "[평균 후원 금액] = 금액/건수",
+            "example_query": "SELECT AVG(regular_donation), AVG(temporary_donation) FROM source_report WHERE event_date BETWEEN '20240101' AND '20241231'"
+        },
+        {
+            "prompt": "2024년 12월 정기후원이 가장 많이 발생한 소스/매체는 어디야?",
+            "table": "source_report",
+            "dimension": ["event_date", "source_medium"],
+            "metric": ["regular_donation"],
+            "response_format": "정기후원 발생 수가 가장 높은 소스/매체 반환",
+            "example_query": "SELECT source_medium, SUM(regular_donation) FROM source_report WHERE event_date BETWEEN '20241201' AND '20241231' GROUP BY source_medium ORDER BY SUM(regular_donation) DESC LIMIT 1"
+        }
+    ]
+}
