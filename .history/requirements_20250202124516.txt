@@ -1,0 +1,54 @@
+# 기본 의존성 (순서 중요)
+wheel>=0.45.0
+setuptools>=75.0.0
+
+# Web Framework
+Flask>=3.0.0
+Werkzeug>=3.0.0  # Flask 의존성
+click>=8.0.0     # Flask 의존성
+flask-cors>=4.0.0
+gunicorn>=21.2.0
+python-dotenv>=1.0.0
+
+# Database
+SQLAlchemy>=2.0.0
+alembic>=1.13.0
+psycopg2-binary>=2.9.9
+
+# Async
+aiohttp>=3.9.1
+asyncio>=3.4.3
+
+# Monitoring
+prometheus-client==0.17.1
+
+# Langflow and dependencies
+langflow==0.0.78
+unstructured==0.10.30
+python-multipart==0.0.6
+python-magic==0.4.27
+pdfminer.six==20221105
+opentelemetry-exporter-prometheus==1.12.0rc1
+jina==3.15.2
+docarray<0.21.0
+protobuf<=3.20.3
+langchain==0.0.308
+
+# Utils
+PyJWT==2.8.0
+redis==5.0.0
+requests==2.31.0
+rich>=13.5.0,<14.0.0
+pygments>=2.13.0,<3.0.0
+markdown-it-py>=3.0.0,<4.0.0
+
+# Testing
+pytest==7.4.2
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0
+
+# Additional dependencies
+python-jose>=3.3.0
+passlib>=1.7.4
+pydantic>=2.5.2
+

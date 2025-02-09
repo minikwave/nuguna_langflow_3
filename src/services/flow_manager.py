@@ -1,7 +1,18 @@
 import os
 import json
+from asyncio import Lock
+from typing import Dict
 
 FLOWS_DIR = "data/flows"
+
+class FlowManager:
+    def __init__(self):
+        self._locks: Dict[str, Lock] = {}
+        
+    async def get_flow_lock(self, flow_id: str) -> Lock:
+        if flow_id not in self._locks:
+            self._locks[flow_id] = Lock()
+        return self._locks[flow_id]
 
 def save_flow(user_id, flow_name, flow_content):
     """사용자별 Flow를 저장."""

@@ -34,3 +34,28 @@ def get_db_status(db_path):
         return f"오류: {str(e)}"
     finally:
         connection.close()
+
+def execute_query(db_path, query, params=None):
+    """
+    SQL 쿼리를 실행하고 결과를 반환.
+    :param db_path: 데이터베이스 파일 경로
+    :param query: 실행할 SQL 쿼리
+    :param params: 쿼리에 전달할 매개변수 (기본값: None)
+    :return: 쿼리 결과 또는 오류 메시지
+    """
+    connection = sqlite3.connect(db_path)
+    cursor = connection.cursor()
+    try:
+        if params:
+            cursor.execute(query, params)
+        else:
+            cursor.execute(query)
+        if query.strip().upper().startswith("SELECT"):
+            return cursor.fetchall()  # SELECT 쿼리의 결과 반환
+        else:
+            connection.commit()  # INSERT, UPDATE, DELETE 쿼리의 경우 변경 사항 적용
+            return "Query executed successfully"
+    except Exception as e:
+        return f"쿼리 실행 오류: {str(e)}"
+    finally:
+        connection.close()

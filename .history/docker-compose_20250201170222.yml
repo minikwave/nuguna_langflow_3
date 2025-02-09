@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:5000
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=development
+      - DATABASE_URL=sqlite:///data/app.db
+      - LANGFLOW_API_URL=http://langflow:7860
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      - langflow
+
+  langflow:
+    image: logspace/langflow:latest
+    ports:
+      - "7860:7860"
+    environment:
+      - LANGFLOW_AUTO_SAVING=true
+      - LANGFLOW_DATABASE_URL=sqlite:///data/langflow.db
+      - LANGFLOW_SUPERUSER=${LANGFLOW_SUPERUSER}
+      - LANGFLOW_SUPERUSER_PASSWORD=${LANGFLOW_SUPERUSER_PASSWORD}
+      - LANGFLOW_SECRET_KEY=${LANGFLOW_SECRET_KEY}
+      - LANGFLOW_OPENAI_API_KEY=${OPENAI_API_KEY}
+    volumes:
+      - ./data:/data
+      - ./custom_components:/custom_components
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7860/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+
+volumes:
+  langflow_data:
+  redis_data:

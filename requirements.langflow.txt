@@ -1,0 +1,7 @@
+langflow==0.0.78
+langchain==0.0.176
+openai==0.27.8
+protobuf==3.20.3
+python-dotenv>=1.0.0
+psutil==5.9.5
+gunicorn==20.1.0 

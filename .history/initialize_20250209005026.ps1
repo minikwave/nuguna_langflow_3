@@ -1,0 +1,161 @@
+# 현재 스크립트의 절대 경로 가져오기
+$scriptPath = $MyInvocation.MyCommand.Path
+$projectRoot = Split-Path -Parent $scriptPath
+
+# 로그 파일 설정
+$logFile = Join-Path $projectRoot "logs\initialize_$(Get-Date -Format 'yyyyMMdd_HHmmss').log"
+New-Item -ItemType Directory -Path (Split-Path $logFile) -Force | Out-Null
+
+# 로그 기록 함수
+function Write-Log {
+    param($Message)
+    $logMessage = "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss'): $Message"
+    Write-Host $logMessage
+    Add-Content -Path $logFile -Value $logMessage
+}
+
+# 컨테이너 상태 확인 함수
+function Wait-ForHealthyContainer {
+    param (
+        [string]$containerName,
+        [int]$timeoutSeconds = 30
+    )
+    
+    $startTime = Get-Date
+    $healthy = $false
+    
+    while (-not $healthy -and ((Get-Date) - $startTime).TotalSeconds -lt $timeoutSeconds) {
+        $status = docker inspect -f '{{.State.Health.Status}}' $containerName 2>$null
+        if ($status -eq "healthy") {
+            $healthy = $true
+            break
+        }
+        Start-Sleep -Seconds 2
+    }
+    
+    return $healthy
+}
+
+# 포트 확인 및 정리 함수
+function Clear-UsedPorts {
+    param (
+        [int[]]$ports = @(3000, 5000, 5433, 6379, 7860)
+    )
+    Write-Log "🔍 사용 중인 포트 확인 중..."
+    
+    foreach ($port in $ports) {
+        $process = Get-NetTCPConnection -LocalPort $port -ErrorAction SilentlyContinue | 
+                  Select-Object -ExpandProperty OwningProcess
+        if ($process) {
+            try {
+                Stop-Process -Id $process -Force
+                Write-Log "  ✅ 포트 $port 를 사용하는 프로세스를 종료했습니다."
+            } catch {
+                Write-Log "  ❌ 포트 $port 를 사용하는 프로세스 종료 실패: $_"
+            }
+        }
+    }
+}
+
+try {
+    Write-Log "🔧 Text-to-SQL 프로젝트 초기화를 시작합니다..."
+    
+    # 포트 정리
+    Clear-UsedPorts
+    
+    # Docker Desktop 실행 확인
+    $dockerProcess = Get-Process "Docker Desktop" -ErrorAction SilentlyContinue
+    if (-not $dockerProcess) {
+        Write-Log "🔄 Docker Desktop 시작 중..."
+        Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
+        Start-Sleep -Seconds 30
+    }
+    
+    # Docker 서비스 상태 확인
+    Write-Log "  ✅ Docker 서비스가 실행 중입니다."
+    Start-Sleep -Seconds 10
+    
+    # 기존 리소스 정리
+    Write-Log "🔄 Docker 환경 초기화 중..."
+    docker-compose down -v --remove-orphans 2>&1 | Out-Null
+    docker system prune -af --volumes 2>&1 | Out-Null
+    
+    # 네트워크 재생성
+    docker network rm text-to-sql-network -f 2>&1 | Out-Null
+    Start-Sleep -Seconds 2
+    docker network create text-to-sql-network 2>&1 | Out-Null
+    
+    # 서비스 순차적 시작
+    Write-Log "🔄 서비스 시작 중..."
+    
+    # DB 시작
+    Write-Log "  ⌛ 데이터베이스 시작 중..."
+    docker-compose up -d db 2>&1 | Out-Null
+    if (-not (Wait-ForHealthyContainer "text-to-sql-db" 30)) {
+        throw "데이터베이스 시작 실패"
+    }
+    
+    # Redis 시작
+    Write-Log "  ⌛ Redis 시작 중..."
+    docker-compose up -d redis 2>&1 | Out-Null
+    if (-not (Wait-ForHealthyContainer "text-to-sql-redis" 20)) {
+        throw "Redis 시작 실패"
+    }
+    
+    # Langflow 시작
+    Write-Log "  ⌛ Langflow 시작 중..."
+    docker-compose up -d langflow 2>&1 | Out-Null
+    Start-Sleep -Seconds 15
+    if (-not (Wait-ForHealthyContainer "text-to-sql-langflow" 120)) {
+        throw "Langflow 시작 실패"
+    }
+    
+    # Backend 시작
+    Write-Log "  ⌛ Backend 시작 중..."
+    docker-compose up -d backend 2>&1 | Out-Null
+    if (-not (Wait-ForHealthyContainer "text-to-sql-backend" 30)) {
+        throw "Backend 시작 실패"
+    }
+    
+    # Frontend 시작
+    Write-Log "  ⌛ Frontend 시작 중..."
+    docker-compose up -d frontend 2>&1 | Out-Null
+    Start-Sleep -Seconds 10
+    
+    # 최종 상태 확인
+    Write-Log "🔄 최종 상태 확인 중..."
+    $services = @(
+        @{Name="Database"; Port=5433},
+        @{Name="Redis"; Port=6379},
+        @{Name="Langflow"; Port=7860},
+        @{Name="Backend"; Port=5000},
+        @{Name="Frontend"; Port=3000}
+    )
+    
+    foreach ($service in $services) {
+        if (Test-NetConnection -ComputerName "localhost" -Port $service.Port -InformationLevel Quiet) {
+            Write-Log "✅ $($service.Name) is running on port $($service.Port)"
+        } else {
+            Write-Log "❌ $($service.Name) is not responding on port $($service.Port)"
+        }
+    }
+    
+    Write-Log "`n✅ 초기화가 완료되었습니다!"
+    Write-Log "📝 접속 정보:"
+    Write-Log "- Frontend: http://localhost:3000"
+    Write-Log "- Backend: http://localhost:5000"
+    Write-Log "- Langflow: http://localhost:7860"
+    Write-Log "- Database: localhost:5433"
+    Write-Log "- Redis: localhost:6379"
+}
+catch {
+    Write-Log "🚨 초기화 중 오류가 발생했습니다: $_"
+    Write-Log "🔄 정리 작업 실행 중..."
+    docker-compose down -v --remove-orphans 2>&1 | Out-Null
+    Write-Log "❗ 자세한 오류 내용은 다음 로그 파일을 확인하세요: $logFile"
+    Read-Host "Enter 키를 눌러 종료하세요..."
+    exit 1
+}
+
+Write-Log "`n⚠️ 스크립트 실행이 완료되었습니다. 로그 파일 위치: $logFile"
+Read-Host "Enter 키를 눌러 종료하세요..."

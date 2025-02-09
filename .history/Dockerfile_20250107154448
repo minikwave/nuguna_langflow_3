@@ -1,0 +1,59 @@
+# Base image
+FROM python:3.11-slim
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libsqlite3-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements file and install dependencies
+COPY requirements.txt .
+RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
+
+# Copy the application code
+COPY src /app/src
+COPY data /app/data
+
+# Set environment variables
+ENV FLASK_APP=src.app.main:app
+ENV FLASK_ENV=production
+ENV PYTHONPATH=/app/src
+ENV LANGFLOW_SUPERUSER=admin
+ENV LANGFLOW_SUPERUSER_PASSWORD=securepassword
+ENV LANGFLOW_SECRET_KEY=your-secure-secret-key
+ENV LANGFLOW_AUTO_SAVING=true
+
+# Expose ports for Langflow and Flask
+EXPOSE 7860 5000
+
+# Run Langflow and Flask servers
+CMD ["sh", "-c", "python -m langflow run & flask run --host=0.0.0.0 --port=5000"]
+
+
+# # Base image
+# FROM python:3.10-slim
+
+# # Set working directory
+# WORKDIR /app
+
+# # Copy requirements file and install dependencies
+# COPY requirements.txt .
+# RUN pip install --no-cache-dir -r requirements.txt
+
+# # Copy the application code
+# COPY src /app/src
+# COPY data /app/data
+
+# # Set environment variables
+# ENV FLASK_APP=app.main:app
+# ENV FLASK_ENV=production
+
+# # Expose port 5000
+# EXPOSE 5000
+
+# # Run the Flask application
+# CMD ["flask", "run", "--host=0.0.0.0", "--port=5000"]

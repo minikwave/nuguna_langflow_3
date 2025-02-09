@@ -1,0 +1,44 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:13
+    container_name: text-to-sql-db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: text_to_sql
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:alpine
+    container_name: text-to-sql-redis
+    ports:
+      - "6379:6379"
+
+  langflow:
+    image: logspace/langflow:latest
+    container_name: text-to-sql-langflow
+    ports:
+      - "7860:7860"
+    environment:
+      - LANGFLOW_AUTO_LOGIN=false
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: text-to-sql-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - REACT_APP_API_URL=http://localhost:5000
+      - REACT_APP_LANGFLOW_URL=http://localhost:7860
+
+volumes:
+  postgres_data:
+    name: text-to-sql-postgres-data
+

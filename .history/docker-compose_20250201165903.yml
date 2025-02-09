@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:5000
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=development
+      - DATABASE_URL=sqlite:///data/app.db
+      - LANGFLOW_API_URL=http://langflow:7860
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      - langflow
+
+  langflow:
+    image: logspace/langflow:latest
+    ports:
+      - "7860:7860"
+    environment:
+      - LANGFLOW_AUTO_SAVING=true
+      - LANGFLOW_DATABASE_URL=sqlite:///data/langflow.db
+    volumes:
+      - ./data:/data
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+
+volumes:
+  langflow_data:
+  redis_data:

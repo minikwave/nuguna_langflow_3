@@ -1,0 +1,81 @@
+# Base image
+FROM python:3.11-slim
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libsqlite3-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create logs directory for supervisord
+RUN mkdir -p /app/logs
+
+# Upgrade pip and install dependencies
+COPY requirements.txt .
+RUN pip install --upgrade pip setuptools wheel \
+    && pip install --use-deprecated=legacy-resolver --no-cache-dir -r requirements.txt
+
+# Copy the application code
+COPY src /app/src
+COPY data /app/data
+
+# Set environment variables
+ENV FLASK_APP=src.app.main:app
+ENV FLASK_ENV=production
+ENV PYTHONPATH=/app/src
+ENV LANGFLOW_SUPERUSER=admin
+ENV LANGFLOW_SUPERUSER_PASSWORD=securepassword
+ENV LANGFLOW_SECRET_KEY=your-secure-secret-key
+ENV LANGFLOW_AUTO_SAVING=true
+
+# Expose ports for Langflow and Flask
+EXPOSE 7860 5000
+
+# Install and configure supervisord
+RUN pip install supervisor
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# Start both servers using supervisord
+CMD ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+
+
+# # Base image
+# FROM python:3.11-slim
+
+# # Set working directory
+# WORKDIR /app
+
+# # Install system dependencies
+# RUN apt-get update && apt-get install -y --no-install-recommends \
+#     build-essential \
+#     libsqlite3-dev \
+#     && rm -rf /var/lib/apt/lists/*
+
+# # Upgrade pip and install dependencies
+# COPY requirements.txt .
+# RUN pip install --upgrade pip setuptools wheel && pip install --no-cache-dir -r requirements.txt
+
+# # Copy the application code
+# COPY src /app/src
+# COPY data /app/data
+
+# # Set environment variables
+# ENV FLASK_APP=src.app.main:app
+# ENV FLASK_ENV=production
+# ENV PYTHONPATH=/app/src
+# ENV LANGFLOW_SUPERUSER=admin
+# ENV LANGFLOW_SUPERUSER_PASSWORD=securepassword
+# ENV LANGFLOW_SECRET_KEY=your-secure-secret-key
+# ENV LANGFLOW_AUTO_SAVING=true
+
+# # Expose ports for Langflow and Flask
+# EXPOSE 7860 5000
+
+# # Start both Langflow and Flask servers using supervisord
+# RUN pip install supervisor
+# COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# CMD ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

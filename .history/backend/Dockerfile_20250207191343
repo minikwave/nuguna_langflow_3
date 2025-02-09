@@ -1,0 +1,35 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# 기본 도구 및 PostgreSQL 클라이언트 설치
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    curl \
+    postgresql-client \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# 의존성 설치
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# 애플리케이션 코드 복사
+COPY . .
+
+# 시작 스크립트 생성
+RUN echo '#!/bin/sh\n\
+# DB 연결 대기\n\
+while ! pg_isready -h db -p 5432 -U postgres; do\n\
+    echo "Waiting for database..."\n\
+    sleep 2\n\
+done\n\
+\n\
+# Flask 실행\n\
+exec python -m flask run --host=0.0.0.0\n\
+' > /init.sh && chmod +x /init.sh
+
+HEALTHCHECK --interval=10s --timeout=5s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:5000/health || exit 1
+
+CMD ["/init.sh"] 

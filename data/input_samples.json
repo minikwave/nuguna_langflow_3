@@ -1,0 +1,14 @@
+[
+    {
+        "input": "Show all users in the database.",
+        "expected_output": "SELECT * FROM users;"
+    },
+    {
+        "input": "Find all users above 30 years old.",
+        "expected_output": "SELECT * FROM users WHERE age > 30;"
+    },
+    {
+        "input": "Add a user named John with age 40.",
+        "expected_output": "INSERT INTO users (name, age) VALUES ('John', 40);"
+    }
+]

@@ -1,0 +1,37 @@
+# Core dependencies
+flask==2.3.2
+langflow==0.5.3
+langchain==0.0.329
+chromadb==0.3.29
+numpy==1.23.5
+pandas==2.0.3
+
+# Database
+sqlalchemy==2.0.23
+psycopg2-binary==2.9.9
+alembic==1.12.1
+
+# API & Web
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+gunicorn==21.2.0
+websockets==11.0.3
+httpx==0.24.1
+
+# Testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0
+
+# Utils
+python-dotenv==1.0.0
+pydantic==1.10.13
+redis==5.0.1
+aiohttp==3.9.1
+jinja2==3.1.2
+
+# Langflow specific
+unstructured==0.5.12
+pdf2image==1.16.3
+sentence-transformers==2.2.2
+

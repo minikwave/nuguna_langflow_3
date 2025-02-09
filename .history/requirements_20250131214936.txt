@@ -1,0 +1,14 @@
+Flask==2.3.2
+requests==2.31.0
+python-dotenv==1.0.0
+SQLAlchemy==2.0.23
+pytest==7.4.2
+pytest-cov==4.1.0
+pandas==2.0.0
+numpy==1.24.0
+plotly==5.15.0
+python-jose==3.3.0
+pydantic==2.5.2
+fastapi==0.100.0
+httpx==0.24.1
+

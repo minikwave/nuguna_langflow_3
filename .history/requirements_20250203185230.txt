@@ -1,0 +1,46 @@
+# 기본 의존성 (순서 중요)
+wheel>=0.45.0
+setuptools>=75.0.0
+
+# Web Framework
+Flask>=3.0.0
+Werkzeug>=3.0.0
+click>=8.0.0
+flask-cors>=4.0.0
+gunicorn==20.1.0
+
+# Database
+SQLAlchemy>=2.0.0
+alembic>=1.13.0
+psycopg2-binary>=2.9.9
+
+# Auth
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+PyJWT==2.8.0
+
+# Utils
+python-dotenv>=1.0.0
+requests==2.31.0
+aiohttp>=3.9.1
+redis==5.0.0
+python-magic==0.4.27
+pdfminer.six==20221105
+opentelemetry-exporter-prometheus==1.12.0rc1
+jina==3.15.2
+docarray<0.21.0
+protobuf<=3.20.3
+langchain==0.0.308
+gptcache<0.2.0
+markdown-it-py>=3.0.0,<4.0.0
+rich>=13.5.0,<14.0.0
+pygments>=2.13.0,<3.0.0
+
+# Testing
+pytest==7.4.2
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0
+
+# Additional dependencies
+python-multipart==0.0.6
+

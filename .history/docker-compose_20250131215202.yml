@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_APP=src/app/main.py
+      - FLASK_ENV=development
+      - LANGFLOW_API_URL=http://langflow:7860
+    volumes:
+      - .:/app
+    depends_on:
+      - langflow
+
+  langflow:
+    image: logspace/langflow:latest
+    ports:
+      - "7860:7860"
+    environment:
+      - LANGFLOW_AUTO_LOGIN=false
+    volumes:
+      - langflow_data:/data
+
+volumes:
+  langflow_data:

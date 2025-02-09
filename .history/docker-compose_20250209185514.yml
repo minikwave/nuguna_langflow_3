@@ -1,0 +1,102 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:13
+    container_name: text-to-sql-db
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${DB_NAME:-text_to_sql}
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    command: postgres -c 'max_connections=200'
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - text-to-sql-network
+
+  redis:
+    image: redis:alpine
+    container_name: text-to-sql-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - text-to-sql-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: text-to-sql-backend
+    environment:
+      - FLASK_APP=src.app:create_app
+      - FLASK_ENV=development
+      - DATABASE_URL=postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@db:5432/${DB_NAME:-text_to_sql}
+      - REDIS_URL=redis://redis:6379/0
+      - LANGFLOW_API_URL=http://langflow:7860
+    volumes:
+      - ./backend:/app
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+      - redis
+      - langflow
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    networks:
+      - text-to-sql-network
+
+  langflow:
+    build:
+      context: ./langflow
+      dockerfile: Dockerfile
+    container_name: text-to-sql-langflow
+    environment:
+      - LANGFLOW_AUTO_LOGIN=false
+    volumes:
+      - langflow_data:/data
+    ports:
+      - "7860:7860"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7860/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - text-to-sql-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: text-to-sql-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:5000
+      - REACT_APP_LANGFLOW_URL=http://localhost:7860
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+    name: text-to-sql-postgres-data
+  langflow_data:
+    name: text-to-sql-langflow-data
+
